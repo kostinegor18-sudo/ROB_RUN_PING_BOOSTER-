@@ -1,0 +1,24 @@
+name: Build Windows EXE
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install .NET 8 SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - name: Publish self-contained EXE
+        run: dotnet publish ROB_RUN_PING_BOOSTER.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true -o publish
+      - name: Upload EXE
+        uses: actions/upload-artifact@v4
+        with:
+          name: ROB-RUN-PING-BOOSTER-Windows-x64
+          path: publish/ROB RUN PING BOOSTER.exe
+          if-no-files-found: error
